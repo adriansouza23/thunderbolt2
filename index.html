@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thunderbolt</title>
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{
+  color:#fff;
+  background:#000;
+  overflow-x:hidden;
+}
+
+
+  /* ====== FUNDO GAMER (LUZES) ====== */
+  .fx-bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:-1;
+    opacity:0.9;
+  }
+  .fx-bg::before,
+  .fx-bg::after{
+    content:"";
+    position:absolute;
+    inset:-20%;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(88,101,242,0.18), transparent 35%),
+      radial-gradient(circle at 80% 40%, rgba(0,255,255,0.10), transparent 35%),
+      radial-gradient(circle at 50% 80%, rgba(160,60,255,0.10), transparent 40%);
+    filter: blur(18px);
+    animation: floatGlow 10s ease-in-out infinite;
+  }
+  .fx-bg::after{
+    animation-duration: 14s;
+    opacity:0.7;
+    transform: rotate(8deg);
+  }
+  @keyframes floatGlow{
+    0%{transform:translate3d(0,0,0) scale(1);}
+    50%{transform:translate3d(20px,-10px,0) scale(1.05);}
+    100%{transform:translate3d(0,0,0) scale(1);}
+  }
+
+  /* ====== LOADING ====== */
+  .loading{
+    position:fixed;
+    inset:0;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  }
+  .loading-box{
+    text-align:center;
+    padding:28px 22px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.08);
+    background: rgba(10,10,10,0.65);
+    backdrop-filter: blur(6px);
+    width:min(520px, 92vw);
+  }
+  .loading-title{
+    font-size:34px;
+    letter-spacing:4px;
+    font-weight:900;
+    margin-bottom:16px;
+  }
+  .loading-bar{
+    height:10px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.10);
+    overflow:hidden;
+    position:relative;
+  }
+  .loading-bar span{
+    position:absolute;
+    inset:0;
+    width:40%;
+    background: linear-gradient(90deg, transparent, rgba(88,101,242,1), rgba(0,255,255,0.9), transparent);
+    animation: loadRun 1.2s linear infinite;
+  }
+  @keyframes loadRun{
+    0%{transform:translateX(-100%);}
+    100%{transform:translateX(250%);}
+  }
+  .loading-sub{
+    margin-top:14px;
+    color:#bdbdbd;
+    font-size:14px;
+    letter-spacing:1px;
+  }
+
+  /* ====== HEADER (NÃO FIXO) ====== */
+  header{
+    width:100%;
+    padding:20px 60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    background: rgba(0,0,0,0.55);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex:0 0 auto;
+  }
+  .logo img{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    object-fit:cover;
+  }
+  .logo strong{
+    font-size:26px;
+    letter-spacing:3px;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 0 12px rgba(88,101,242,0.55);
+  }
+
+  /* ===== EFEITO RAIO NO TITULO THUNDERBOLT ===== */
+  .logo strong::after{
+    content:"";
+    position:absolute;
+    left:-30%;
+    top:50%;
+    width:160%;
+    height:2px;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(0,255,255,0.0),
+      rgba(0,255,255,0.95),
+      rgba(88,101,242,1),
+      rgba(0,255,255,0.95),
+      rgba(0,255,255,0.0),
+      transparent
+    );
+    filter: blur(0.2px);
+    opacity: 0;
+    animation: thunderScan 2.8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes thunderScan{
+    0%{ opacity:0; transform: translateY(-50%) translateX(-40%) skewX(-18deg); }
+    10%{ opacity:1; }
+    30%{ opacity:0.9; }
+    55%{ opacity:0; transform: translateY(-50%) translateX(40%) skewX(-18deg); }
+    100%{ opacity:0; transform: translateY(-50%) translateX(40%) skewX(-18deg); }
+  }
+
+  /* ====== SEARCH ====== */
+  .search-wrap{position:relative;flex:0 0 auto;}
+  .search-input{
+    padding:14px 20px;
+    border-radius:25px;
+    border:none;
+    outline:none;
+    width:320px;
+    font-size:16px;
+  }
+  .search-results{
+    position:absolute;
+    right:0;
+    top:52px;
+    width:320px;
+    background:#111;
+    border:1px solid #222;
+    border-radius:12px;
+    overflow:hidden;
+    display:none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+  .search-results a{
+    display:block;
+    padding:12px 14px;
+    text-decoration:none;
+    color:#fff;
+    border-bottom:1px solid #222;
+  }
+  .search-results a:hover{background:#1b1b1b;}
+  .search-results a:last-child{border-bottom:none;}
+  .small-hint{font-size:12px;color:#aaa;padding:10px 14px;}
+
+  /* ====== BOTÃO DISCORD (ANIMADO) ====== */
+.discord-btn{
+  position:relative;
+  background:#5865F2;
+  padding:16px 36px;
+  border-radius:40px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:2px;
+  overflow:hidden;
+  transition:0.3s;
+  box-shadow:0 0 20px #5865F2;
+  white-space:nowrap;
+  display:inline-block;
+  animation:discordPulse 2s infinite;
+}
+
+/* brilho passando */
+.discord-btn::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-75%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.6),
+    transparent
+  );
+  transform:skewX(-25deg);
+  transition:0.6s;
+}
+
+.discord-btn:hover::before{
+  left:130%;
+}
+
+.discord-btn:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 35px #5865F2, 0 0 60px #7289da;
+}
+
+/* pulsação neon */
+@keyframes discordPulse{
+  0%{ box-shadow:0 0 15px #5865F2; }
+  50%{ box-shadow:0 0 35px #5865F2; }
+  100%{ box-shadow:0 0 15px #5865F2; }
+}
+
+  .discord-btn:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 35px rgba(88,101,242,0.85);
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 10px rgba(88,101,242,0.35);}
+    50%{box-shadow:0 0 32px rgba(88,101,242,0.85);}
+    100%{box-shadow:0 0 10px rgba(88,101,242,0.35);}
+  }
+
+  /* ====== SEÇÕES ====== */
+  main{padding-bottom:60px;}
+  .section{ padding:90px 80px; }
+
+  /* Animação ao rolar */
+  .reveal{
+    opacity:0;
+    transform: translateY(26px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.show{
+    opacity:1;
+    transform: translateY(0);
+  }
+
+  /* ====== ABOUT ====== */
+  .about{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:50px;
+  }
+  .about-text{max-width:620px;}
+  .about-text h1{
+    font-size:44px;
+    margin-bottom:18px;
+    letter-spacing:1px;
+  }
+  .about-text p{
+    font-size:18px;
+    line-height:1.7;
+    color:#ddd;
+  }
+  .about-img img{
+    width:360px;
+    max-width:100%;
+    height:auto;
+    display:block;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.08);
+    transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+  }
+  .about-img img:hover{
+    transform: scale(1.03);
+    box-shadow: 0 0 28px rgba(88,101,242,0.28);
+    filter: brightness(1.05);
+  }
+
+  /* ====== HERO BANNER ====== */
+  .hero{ padding:0; }
+  .hero img{
+    width:100%;
+    height:auto;
+    display:block;
+    border-top:1px solid rgba(255,255,255,0.06);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ====== JOGOS ====== */
+  .games-title{
+    text-align:center;
+    font-size:34px;
+    margin-bottom:26px;
+    letter-spacing:2px;
+  }
+  .games-grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap:16px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+.game-card{
+  position:relative;
+  overflow:hidden;
+}
+
+.game-card img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:12px;
+  transition:0.4s ease;
+}
+
+.game-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-75%;
+  width:50%;
+  height:200px;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.6),
+    transparent
+  );
+  transform:skewX(-25deg);
+  transition:0.6s;
+  pointer-events:none;
+}
+
+.game-card:hover::before{
+  left:130%;
+}
+
+.game-card:hover img{
+  transform:scale(1.08);
+}
+
+
+  .game-emoji{font-size:30px;margin-bottom:10px;}
+  .game-name{font-weight:900;letter-spacing:1px;margin-bottom:6px;}
+  .game-desc{color:#cfcfcf;font-size:14px;line-height:1.5;}
+
+  /* ====== LÍDER ====== */
+  .lider{ text-align:center; }
+  .lider img{
+    max-width:900px;
+    width:100%;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.08);
+    height:auto;
+    display:block;
+    margin:0 auto;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .lider img:hover{
+    transform: scale(1.01);
+    box-shadow: 0 0 26px rgba(0,255,255,0.12);
+  }
+  .lider h2{ margin-top:34px; font-size:32px; }
+  .lider p{
+    margin-top:18px;
+    font-size:18px;
+    line-height:1.8;
+    color:#ddd;
+    max-width:920px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .lider p + p{margin-top:14px;}
+
+  /* ====== FINAL ====== */
+  .final{
+    text-align:center;
+    padding:90px 40px 110px;
+  }
+  .final img{
+    max-width:720px;
+    width:100%;
+    height:auto;
+    display:block;
+    margin:0 auto 24px;
+  }
+  .final p{
+    font-size:22px;
+    letter-spacing:2px;
+    font-weight:900;
+    margin-bottom:18px;
+  }
+  .final .discord-btn{
+    margin-top:60px;
+  }
+
+  /* ====== BOTÃO VOLTAR AO TOPO ====== */
+  .to-top{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background: rgba(17,17,17,0.9);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transform: translateY(10px);
+    transition: .25s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  }
+  .to-top.show{
+    opacity:1;
+    pointer-events:auto;
+    transform: translateY(0);
+  }
+  .to-top:hover{
+    box-shadow: 0 0 22px rgba(88,101,242,0.35);
+    transform: translateY(-2px);
+  }
+
+  /* ====== FOOTER ====== */
+  footer{
+    border-top:1px solid rgba(255,255,255,0.06);
+    padding:26px 16px;
+    text-align:center;
+    color:#bdbdbd;
+    background: rgba(0,0,0,0.55);
+  }
+  footer strong{color:#fff;}
+
+  /* ====== RESPONSIVO ====== */
+  @media (max-width: 1000px){
+    .games-grid{grid-template-columns: repeat(2, minmax(0, 1fr));}
+  }
+  @media (max-width: 900px){
+    header{
+      padding:16px 18px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .logo{width:100%; justify-content:center;}
+    .logo strong{font-size:22px;}
+    .logo img{width:50px;height:50px;}
+    .search-wrap{width:100%;}
+    .search-input{width:100%;}
+    .search-results{width:100%; left:0; right:0;}
+
+    .section{padding:70px 18px;}
+    .about{
+      flex-direction:column;
+      text-align:center;
+      gap:18px;
+    }
+    .about-text h1{font-size:34px;}
+    .about-img img{width:260px;}
+    .games-title{font-size:28px;}
+  }
+
+  /* ===== BOTÕES REDES SOCIAIS ===== */
+
+.social-buttons{
+  margin-top:40px;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.social-btn{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 26px;
+  border-radius:30px;
+  text-decoration:none;
+  font-weight:bold;
+  color:#fff;
+  background:#111;
+  border:1px solid #333;
+  overflow:hidden;
+  transition:0.3s;
+}
+
+.social-btn::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-75%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent
+  );
+  transform:skewX(-25deg);
+  transition:0.5s;
+}
+
+.social-btn:hover::before{
+  left:130%;
+}
+
+.social-btn:hover{
+  transform:scale(1.08);
+}
+
+
+.social-btn img{
+  width:20px;
+  height:20px;
+  object-fit:contain;
+}
+
+.social-btn:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 15px rgba(255,255,255,0.2);
+}
+
+/* cores individuais */
+.tiktok:hover{
+  box-shadow:0 0 25px #00f2ea, 0 0 40px #ff0050;
+}
+
+.instagram:hover{
+  box-shadow:0 0 25px #e1306c, 0 0 40px #833ab4;
+}
+
+.youtube:hover{
+  box-shadow:0 0 25px #ff0000, 0 0 40px #ff4d4d;
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="loading-box">
+    <div class="loading-title">THUNDERBOLT</div>
+    <div class="loading-bar"><span></span></div>
+    <div class="loading-sub">Carregando a energia ⚡</div>
+  </div>
+</div>
+
+<header class="reveal">
+  <div class="logo">
+    <img src="logo.png" alt="Logo Thunderbolt" />
+    <strong>THUNDERBOLT</strong>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" id="search" type="text" placeholder="Pesquisar (discord, insta...)" autocomplete="off" />
+    <div class="search-results" id="results"></div>
+  </div>
+</header>
+
+<main>
+  <!-- ABOUT -->
+  <section class="section reveal">
+    <div class="about">
+      <div class="about-text">
+        <h1>Bem-vindo ao Thunderbolt</h1>
+        <p>
+          Uma comunidade criada para quem curte jogos, amizade e resenha de verdade.
+          Aqui a diversão é constante e cada membro faz parte de algo especial. Não perca
+          tempo e venha conhecer nossa equipe.
+        </p>
+      </div>
+
+      <div class="about-img">
+        <img src="gundam.png" alt="Gundam Thunderbolt" />
+      </div>
+    </div>
+  </section>
+
+  <!-- BANNER -->
+  <section class="hero reveal">
+    <img src="banner.jpg" alt="Banner Thunderbolt" />
+  </section>
+
+  <!-- JOGOS -->
+<section class="section reveal">
+  <h2 class="games-title">JOGOS QUE JOGAMOS</h2>
+
+  <div class="games-grid">
+
+    <div class="game-card">
+      <img src="gta.jpg" alt="GTA">
+      <div class="game-name">Minecreft</div>
+      <div class="game-desc">Rolê e resenha com a galera.</div>
+    </div>
+
+    <div class="game-card">
+      <img src="valorant.jpg" alt="Valorant">
+      <div class="game-name">Valorant</div>
+      <div class="game-desc">Tática, call insana e evolução constante.</div>
+    </div>
+
+    <div class="game-card">
+      <img src="fortnite.jpg" alt="Fortnite">
+      <div class="game-name">Fortnite</div>
+      <div class="game-desc">Build, clutch e diversão sem fim.</div>
+    </div>
+
+    <div class="game-card">
+      <img src="outros.jpg" alt="Outros Jogos">
+      <div class="game-name">Brawlhalla</div>
+      <div class="game-desc">A comunidade decide: sempre tem novidade.</div>
+    </div>
+
+  </div>
+</section>
+
+
+  <!-- LÍDER -->
+  <section class="section reveal">
+    <div class="lider">
+      <img src="lider.jpg" alt="Líder Thunderbolt" onerror="this.onerror=null; this.src='lider.png';" />
+      <h2>Líder & Criador da Thunderbolt</h2>
+
+      <p>
+        Eu sou Adrian, fundador da Thunderbolt. Desde pequeno sempre fui apaixonado por jogos.
+        Cresci vivendo aventuras no mundo digital, criando estratégias, superando desafios e
+        construindo amizades que iam muito além da tela.
+      </p>
+
+      <p>
+        Mas no fundo, sempre existiu um sonho maior: criar algo meu. Não apenas um servidor,
+        mas uma verdadeira equipe — uma família de gamers unida por respeito, parceria e diversão.
+      </p>
+
+      <p>
+        Foi desse sonho que nasceu a Thunderbolt. Baseada na força de uma equipe que acredita
+        que juntos somos mais fortes, mais felizes e mais determinados.
+      </p>
+
+      <p>
+        Aqui não é apenas um grupo de jogadores. É um espaço onde as risadas ecoam,
+        a diversão é constante e cada membro faz parte de algo especial.
+      </p>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+<section class="final reveal">
+  <img src="thunderbolt.png" alt="Thunderbolt" />
+  <p>THUNDERBOLT AGRADECE SUA PRESENÇA</p>
+
+  <a class="discord-btn" href="https://discord.com/invite/MySMbU4z5g" target="_blank">
+    SERVIDOR DO DISCORD
+  </a>
+
+  <div class="social-buttons">
+    <a class="social-btn tiktok" href="https://www.tiktok.com/@gundam_12345?_t=8hFFoLc2CH7&_r=1" target="_blank">
+      <img src="tiktok.png" alt="TikTok">
+      TikTok
+    </a>
+
+    <a class="social-btn instagram" href="https://www.instagram.com/gundam_thunderbolt/" target="_blank">
+      <img src="instagram.png" alt="Instagram">
+      Instagram
+    </a>
+
+    <a class="social-btn youtube" href="https://www.youtube.com/@GUNDAM.THUNDERBOLT" target="_blank">
+      <img src="youtube.png" alt="YouTube">
+      YouTube
+    </a>
+  </div>
+</section>
+
+</main>
+
+<button class="to-top" id="toTop" aria-label="Voltar ao topo">⬆️</button>
+
+<footer>
+  © 2026 <strong>Thunderbolt</strong> • Criado por <strong>Adrian</strong> • Todos os direitos reservados.
+</footer>
+
+<script>
+  // ===== LOADING =====
+  window.addEventListener("load", () => {
+    const loading = document.getElementById("loading");
+    setTimeout(() => { loading.style.display = "none"; }, 800);
+  });
+
+  // ===== PESQUISA (COM FILTRO + LIMPA) =====
+  const links = [
+    { title:"💬 Discord Thunderbolt", url:"https://discord.com/invite/MySMbU4z5g", keywords:["discord","dc","server","servidor","convite","invite"] },
+    { title:"📱 TikTok Thunderbolt", url:"https://www.tiktok.com/@gundam_12345?_t=8hFFoLc2CH7&_r=1", keywords:["tiktok","tik","tt","video","vídeo"] },
+    { title:"📸 Instagram Thunderbolt", url:"https://www.instagram.com/gundam_thunderbolt/", keywords:["instagram","insta","ig","foto","stories","story"] },
+    { title:"▶️ YouTube Thunderbolt", url:"https://www.youtube.com/@GUNDAM.THUNDERBOLT", keywords:["youtube","you","yt","canal","videos","vídeos"] }
+  ];
+
+  const search = document.getElementById("search");
+  const results = document.getElementById("results");
+
+  function clearSearch(){
+    search.value = "";
+    results.style.display = "none";
+    results.innerHTML = "";
+  }
+
+  function filterLinks(q){
+    const query = q.trim().toLowerCase();
+    if(!query) return [];
+    return links.filter(item =>
+      item.title.toLowerCase().includes(query) ||
+      item.keywords.some(k => k.includes(query))
+    );
+  }
+
+  function render(items, query){
+    results.innerHTML = "";
+    if(!query){ results.style.display="none"; return; }
+
+    if(items.length === 0){
+      results.innerHTML = `<div class="small-hint">Nada encontrado 😅<br>Tente: discord, insta, tiktok, youtube</div>`;
+      results.style.display="block";
+      return;
+    }
+
+    items.forEach(item => {
+      const a = document.createElement("a");
+      a.href = item.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = item.title;
+      a.addEventListener("click", clearSearch);
+      results.appendChild(a);
+    });
+
+    results.style.display = "block";
+  }
+
+  search.addEventListener("input", () => {
+    const q = search.value;
+    render(filterLinks(q), q);
+  });
+
+  search.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      const q = search.value;
+      const matches = filterLinks(q);
+      if(matches.length > 0){
+        window.open(matches[0].url, "_blank", "noopener,noreferrer");
+        clearSearch();
+      }
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if(!e.target.closest(".search-wrap")){
+      clearSearch();
+    }
+  });
+
+  // ===== REVEAL ON SCROLL =====
+  const revealEls = document.querySelectorAll(".reveal");
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) entry.target.classList.add("show");
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => io.observe(el));
+
+  // ===== VOLTAR AO TOPO =====
+  const toTop = document.getElementById("toTop");
+  window.addEventListener("scroll", () => {
+    if(window.scrollY > 500) toTop.classList.add("show");
+    else toTop.classList.remove("show");
+  });
+  toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  // ===== SOM ZAP NO CLIQUE (SEM ARQUIVO) =====
+  let audioCtx;
+  function playZap(){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      o.type = "square";
+      o.frequency.setValueAtTime(1200, audioCtx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.08);
+
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.25, audioCtx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.10);
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+
+      o.start();
+      o.stop(audioCtx.currentTime + 0.11);
+    }catch(e){}
+  }
+
+  document.querySelectorAll(".discord-btn").forEach(btn=>{
+    btn.addEventListener("click", () => playZap());
+  });
+
+  // Sempre iniciar no topo ao atualizar
+window.history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+
+
+</script>
+</body>
+</html>

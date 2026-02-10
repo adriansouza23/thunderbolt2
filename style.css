@@ -1,0 +1,139 @@
+body {
+    margin: 0;
+    background-color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+/* Barra do topo */
+.top-bar {
+    width: 100%;
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.logo-area img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff2e2e;
+}
+
+/* Pesquisa */
+.search-container {
+    position: relative;
+    margin-right: 60px;
+}
+
+.search-container input {
+    width: 260px;
+    padding: 10px 40px 10px 12px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    font-size: 15px;
+}
+
+.search-container i {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5865F2;
+    cursor: pointer;
+}
+
+/* HERO */
+.hero {
+    height: 80vh;
+    background-image: linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.6)
+    ), url("hero.png");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    padding-left: 60px;
+}
+
+.hero-content {
+    max-width: 500px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.hero-content p {
+    font-size: 18px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+/* ABOUT (texto + imagem) */
+.about {
+    margin-top: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    padding: 120px 80px;
+}
+
+.about-text {
+    max-width: 600px;
+}
+
+.about-text h1 {
+    font-size: 42px;
+    margin-bottom: 25px;
+}
+
+.about-text p {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #ddd;
+}
+
+.about-img img {
+    width: 340px;
+    max-width: 100%;
+}
+
+/* ===== SEÇÃO DE AGRADECIMENTO ===== */
+.thank-you {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: #0a0a0a;
+  text-align: center;
+}
+
+.thank-you img {
+  width: 250px;
+  max-width: 80%;
+  margin-bottom: 25px;
+}
+
+.thank-you h2 {
+  font-size: 28px;
+  color: #ff2e2e;
+  letter-spacing: 1px;
+}
